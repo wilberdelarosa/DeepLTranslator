@@ -6,20 +6,33 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using DeepLTranslator.Logging;
 
 namespace DeepLTranslator
 {
     public partial class MainForm : Form
     {
-        private readonly DeepLService _deepLService;
-        private readonly TextToSpeechService _textToSpeechService;
+        private readonly DeepLService _deepLService = null!;
+        private readonly TextToSpeechService _textToSpeechService = null!;
+        private readonly List<LanguageInfo> _languages = new();
         private string _lastTranslatedText = string.Empty;
-        
+
         private CancellationTokenSource? _cancellationTokenSource;
 
         public MainForm()
         {
+            // Crear controles para que el diseñador de Visual Studio pueda renderizar el formulario
+            InitializeComponent();
+
+            // Si se está ejecutando dentro del diseñador, omitir la lógica de tiempo de ejecución
+            if (IsInDesignMode())
+            {
+                return;
+            }
+
             try
             {
                 ErrorLogger.LogInfo("Iniciando aplicación DeepL Translator", "MainForm Constructor");
@@ -28,9 +41,9 @@ namespace DeepLTranslator
                 {
                     var errorMsg = "Clave API de DeepL inválida o faltante. Por favor verifica tu configuración.\n\n" +
                         "Puedes configurar la variable de entorno DEEPL_API_KEY con tu clave personal.";
-                    
+
                     ErrorLogger.LogError(new InvalidOperationException("API Key validation failed"), "API Key Validation");
-                    
+
                     MessageBox.Show(errorMsg, "Error de Configuración", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Application.Exit();
                     return;
@@ -38,11 +51,13 @@ namespace DeepLTranslator
 
                 _deepLService = new DeepLService(AppConfig.DeepLApiKey);
                 _textToSpeechService = new TextToSpeechService();
-                
-                InitializeComponent();
+
+                _languages.AddRange(LanguageService.GetLanguagesWithFlags()
+                    .OrderBy(l => l.Name));
+
                 LoadLanguages();
                 SetupEventHandlers();
-                
+
                 _deepLService.TranslationProgress += OnTranslationProgress;
                 _deepLService.TranslationCompleted += OnTranslationCompleted;
 
@@ -51,14 +66,14 @@ namespace DeepLTranslator
             catch (OutOfMemoryException ex)
             {
                 ErrorLogger.LogError(ex, "MainForm Constructor - Memory Error");
-                MessageBox.Show("Error de memoria insuficiente. Por favor cierra otras aplicaciones e intenta nuevamente.", 
+                MessageBox.Show("Error de memoria insuficiente. Por favor cierra otras aplicaciones e intenta nuevamente.",
                     "Error de Memoria", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.Exit();
             }
             catch (UnauthorizedAccessException ex)
             {
                 ErrorLogger.LogError(ex, "MainForm Constructor - Access Error");
-                MessageBox.Show("Error de permisos. Por favor ejecuta la aplicación como administrador.", 
+                MessageBox.Show("Error de permisos. Por favor ejecuta la aplicación como administrador.",
                     "Error de Permisos", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.Exit();
             }
@@ -66,10 +81,16 @@ namespace DeepLTranslator
             {
                 ErrorLogger.LogError(ex, "MainForm Constructor - General Error");
                 MessageBox.Show($"Error crítico al inicializar la aplicación: {ex.Message}\n\n" +
-                    $"Detalles técnicos guardados en: {ErrorLogger.GetLogFilePath()}", 
+                    $"Detalles técnicos guardados en: {ErrorLogger.GetLogFilePath()}",
                     "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.Exit();
             }
+        }
+
+        private static bool IsInDesignMode()
+        {
+            return LicenseManager.UsageMode == LicenseUsageMode.Designtime ||
+                   Process.GetCurrentProcess().ProcessName.ToLower().Contains("devenv");
         }
 
         private void SetupEventHandlers()
@@ -142,22 +163,27 @@ namespace DeepLTranslator
 
         private void LoadLanguages()
         {
-            var languages = LanguageService.GetLanguagesWithFlags()
-                .OrderBy(l => l.Name)
-                .ToList();
-            
+            // Si los controles no están inicializados (p.ej. en modo diseño), salir
+            if (_sourceLanguageComboBox == null || _targetLanguageComboBox == null)
+            {
+                return;
+            }
+
             // Cargar idiomas de origen (incluir "Auto-detect" como primera opción)
             _sourceLanguageComboBox.Items.Clear();
             _sourceLanguageComboBox.Items.Add("🌐 Auto-detect");
-            
-            var formattedLanguages = languages.Select(lang => $"{lang.FlagEmoji} {lang.Name}").ToArray();
+
+            var formattedLanguages = _languages.Select(lang => $"{lang.FlagEmoji} {lang.Name}").ToArray();
             _sourceLanguageComboBox.Items.AddRange(formattedLanguages);
             _sourceLanguageComboBox.SelectedIndex = 0; // Auto-detect por defecto
-            
+
             // Cargar idiomas de destino
             _targetLanguageComboBox.Items.Clear();
             _targetLanguageComboBox.Items.AddRange(formattedLanguages);
-            _targetLanguageComboBox.SelectedIndex = 0; // Inglés por defecto
+
+            // Seleccionar inglés como idioma de destino por defecto
+            var defaultIndex = _languages.FindIndex(l => l.Code.Equals("EN-US", StringComparison.OrdinalIgnoreCase));
+            _targetLanguageComboBox.SelectedIndex = defaultIndex >= 0 ? defaultIndex : 0;
         }
 
         private async Task TranslateText()
@@ -198,33 +224,31 @@ namespace DeepLTranslator
                 _translateButton.Enabled = false;
                 _translateButton.Text = "Preparando traducción...";
 
-                var languages = LanguageService.GetLanguagesWithFlags();
-                
-                if (_targetLanguageComboBox.SelectedIndex < 0 || _targetLanguageComboBox.SelectedIndex >= languages.Count)
+                if (_targetLanguageComboBox.SelectedIndex < 0 || _targetLanguageComboBox.SelectedIndex >= _languages.Count)
                 {
                     throw new ArgumentOutOfRangeException("Selección de idioma de destino inválida");
                 }
-                
-                var targetLanguage = languages[_targetLanguageComboBox.SelectedIndex];
-                
+
+                var targetLanguage = _languages[_targetLanguageComboBox.SelectedIndex];
+
                 string? sourceLanguageCode = null;
                 if (_sourceLanguageComboBox.SelectedIndex > 0) // Si no es "Auto-detect"
                 {
                     var sourceIndex = _sourceLanguageComboBox.SelectedIndex - 1;
-                    
-                    if (sourceIndex < 0 || sourceIndex >= languages.Count)
+
+                    if (sourceIndex < 0 || sourceIndex >= _languages.Count)
                     {
                         throw new ArgumentOutOfRangeException("Selección de idioma de origen inválida");
                     }
-                    
-                    var sourceLanguage = languages[sourceIndex];
+
+                    var sourceLanguage = _languages[sourceIndex];
                     sourceLanguageCode = sourceLanguage.Code;
                 }
 
                 System.Diagnostics.Debug.WriteLine($"Source: {sourceLanguageCode ?? "Auto-detect"}, Target: {targetLanguage.Code}");
 
                 var (translatedText, detectedLanguage) = await _deepLService.TranslateTextAsync(
-                    inputText, 
+                    inputText,
                     targetLanguage.Code,
                     sourceLanguageCode,
                     _cancellationTokenSource.Token);
@@ -300,13 +324,11 @@ namespace DeepLTranslator
             {
                 var sourceIndex = _sourceLanguageComboBox.SelectedIndex;
                 var targetIndex = _targetLanguageComboBox.SelectedIndex;
-                
-                var languages = LanguageService.GetLanguagesWithFlags();
-                
-                if (targetIndex < 0 || targetIndex >= languages.Count || 
-                    sourceIndex <= 0 || sourceIndex - 1 >= languages.Count)
+
+                if (targetIndex < 0 || targetIndex >= _languages.Count ||
+                    sourceIndex <= 0 || sourceIndex - 1 >= _languages.Count)
                 {
-                    MessageBox.Show("Selección de idioma inválida para la operación de intercambio.", 
+                    MessageBox.Show("Selección de idioma inválida para la operación de intercambio.",
                         "Error de Intercambio", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -326,7 +348,7 @@ namespace DeepLTranslator
             }
             else
             {
-                MessageBox.Show("No se pueden intercambiar idiomas cuando se usa Auto-detectar. Por favor selecciona un idioma de origen específico.", 
+                MessageBox.Show("No se pueden intercambiar idiomas cuando se usa Auto-detectar. Por favor selecciona un idioma de origen específico.",
                     "No se Puede Intercambiar", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -355,14 +377,12 @@ namespace DeepLTranslator
                 _listenButton.Enabled = false;
                 _listenButton.Text = "🔊 Reproduciendo...";
 
-                var languages = LanguageService.GetLanguagesWithFlags();
-                
-                if (_targetLanguageComboBox.SelectedIndex < 0 || _targetLanguageComboBox.SelectedIndex >= languages.Count)
+                if (_targetLanguageComboBox.SelectedIndex < 0 || _targetLanguageComboBox.SelectedIndex >= _languages.Count)
                 {
                     throw new ArgumentOutOfRangeException("Selección de idioma inválida para reproducción");
                 }
-                
-                var selectedLanguage = languages[_targetLanguageComboBox.SelectedIndex];
+
+                var selectedLanguage = _languages[_targetLanguageComboBox.SelectedIndex];
                 
                 System.Diagnostics.Debug.WriteLine($"Speaking in language: {selectedLanguage.Code}");
                 
