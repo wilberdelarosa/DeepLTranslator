@@ -256,12 +256,7 @@ namespace DeepLTranslator
                 MessageBox.Show($"Error de conexión: {ex.Message}\n\nVerifica tu conexión a internet e intenta nuevamente.", 
                     "Error de Red", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (TaskCanceledException ex) when (!_cancellationTokenSource.Token.IsCancellationRequested)
-            {
-                ErrorLogger.LogError(ex, "TranslateText - Timeout Error");
-                MessageBox.Show("La solicitud ha excedido el tiempo límite. Verifica tu conexión a internet e intenta nuevamente.", 
-                    "Tiempo Agotado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+         
             catch (Exception ex)
             {
                 ErrorLogger.LogError(ex, $"TranslateText - General Error. Input length: {inputText?.Length}, Target: {_targetLanguageComboBox.SelectedIndex}");

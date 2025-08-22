@@ -13,7 +13,7 @@ namespace DeepLTranslator
         ///  Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-        private CancellationTokenSource _cancellationTokenSource;
+       // private CancellationTokenSource _cancellationTokenSource;
 
         // Controles de la interfaz
         private TextBox _inputTextBox;
