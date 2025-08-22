@@ -1,9 +1,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DeepLTranslator
 {
@@ -13,9 +10,7 @@ namespace DeepLTranslator
         ///  Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-       // private CancellationTokenSource _cancellationTokenSource;
 
-        // Controles de la interfaz
         private TextBox _inputTextBox;
         private TextBox _outputTextBox;
         private ComboBox _sourceLanguageComboBox;
@@ -28,6 +23,13 @@ namespace DeepLTranslator
         private Button _swapButton;
         private ProgressBar _progressBar;
         private Button _cancelButton;
+        private Panel mainPanel;
+        private Label titleLabel;
+        private Label techniquesLabel;
+        private Label inputLabel;
+        private Label fromLabel;
+        private Label toLabel;
+        private Label outputLabel;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -50,353 +52,308 @@ namespace DeepLTranslator
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-            
-            // Configuración del formulario principal
-            this.Text = "DeepL Translator";
-            this.Size = new Size(900, 750);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(248, 249, 250);
-            this.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
-            this.MinimumSize = new Size(800, 650);
-            this.MaximizeBox = true;
-            this.FormBorderStyle = FormBorderStyle.Sizable;
-
-            CreateControls();
-            SetupModernUI();
-
-            this.ResumeLayout(false);
-            this.PerformLayout();
-        }
-
-        private void CreateControls()
-        {
-            // Panel principal con scroll automático
-            var mainPanel = new Panel
-            {
-                Name = "mainPanel",
-                Dock = DockStyle.Fill,
-                Padding = new Padding(20),
-                BackColor = Color.Transparent,
-                AutoScroll = true // Agregar scroll automático para pantallas pequeñas
-            };
-
-            // Título
-            var titleLabel = new Label
-            {
-                Name = "titleLabel",
-                Text = "🌐 DeepL Translator - Práctica Final",
-                Font = new Font("Segoe UI", 18F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(33, 37, 41),
-                AutoSize = true,
-                Location = new Point(0, 0)
-            };
-
-            // Etiqueta de técnicas implementadas
-            var techniquesLabel = new Label
-            {
-                Name = "techniquesLabel",
-                Text = "✨ Implementa: async/await, Task, CancellationToken, Task.WhenAll, Parallel.ForEach, Eventos Personalizados, LINQ",
-                Font = new Font("Segoe UI", 8F, FontStyle.Italic),
-                ForeColor = Color.FromArgb(108, 117, 125),
-                AutoSize = true,
-                Location = new Point(0, 30)
-            };
-
-            // Área de texto de entrada
-            var inputLabel = new Label
-            {
-                Name = "inputLabel",
-                Text = "Enter text to translate:",
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(73, 80, 87),
-                AutoSize = true,
-                Location = new Point(0, 50)
-            };
-
-            _inputTextBox = new TextBox
-            {
-                Name = "_inputTextBox",
-                Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
-                Font = new Font("Segoe UI", 11F),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(33, 37, 41),
-                Location = new Point(0, 75),
-                Size = new Size(840, 120),
-                TabIndex = 0,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            // Selectores de idioma
-            var fromLabel = new Label
-            {
-                Name = "fromLabel",
-                Text = "From:",
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(73, 80, 87),
-                AutoSize = true,
-                Location = new Point(0, 210)
-            };
-
-            _sourceLanguageComboBox = new ComboBox
-            {
-                Name = "_sourceLanguageComboBox",
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 10F),
-                Location = new Point(0, 235),
-                Size = new Size(200, 30),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(33, 37, 41),
-                FlatStyle = FlatStyle.Flat,
-                TabIndex = 1
-            };
-
-            // Botón de intercambio
-            _swapButton = CreateModernButton("⇄", new Point(210, 235), new Size(40, 30), Color.FromArgb(108, 117, 125));
-            _swapButton.Name = "_swapButton";
-            _swapButton.TabIndex = 2;
+            mainPanel = new Panel();
+            titleLabel = new Label();
+            techniquesLabel = new Label();
+            inputLabel = new Label();
+            _inputTextBox = new TextBox();
+            fromLabel = new Label();
+            _sourceLanguageComboBox = new ComboBox();
+            _swapButton = new Button();
+            toLabel = new Label();
+            _targetLanguageComboBox = new ComboBox();
+            _detectedLanguageLabel = new Label();
+            _translateButton = new Button();
+            _clearButton = new Button();
+            _cancelButton = new Button();
+            _progressBar = new ProgressBar();
+            outputLabel = new Label();
+            _outputTextBox = new TextBox();
+            _listenButton = new Button();
+            _copyButton = new Button();
+            mainPanel.SuspendLayout();
+            SuspendLayout();
+            // 
+            // mainPanel
+            // 
+            mainPanel.AutoScroll = true;
+            mainPanel.BackColor = Color.Transparent;
+            mainPanel.Controls.Add(titleLabel);
+            mainPanel.Controls.Add(techniquesLabel);
+            mainPanel.Controls.Add(inputLabel);
+            mainPanel.Controls.Add(_inputTextBox);
+            mainPanel.Controls.Add(fromLabel);
+            mainPanel.Controls.Add(_sourceLanguageComboBox);
+            mainPanel.Controls.Add(_swapButton);
+            mainPanel.Controls.Add(toLabel);
+            mainPanel.Controls.Add(_targetLanguageComboBox);
+            mainPanel.Controls.Add(_detectedLanguageLabel);
+            mainPanel.Controls.Add(_translateButton);
+            mainPanel.Controls.Add(_clearButton);
+            mainPanel.Controls.Add(_cancelButton);
+            mainPanel.Controls.Add(_progressBar);
+            mainPanel.Controls.Add(outputLabel);
+            mainPanel.Controls.Add(_outputTextBox);
+            mainPanel.Controls.Add(_listenButton);
+            mainPanel.Controls.Add(_copyButton);
+            mainPanel.Dock = DockStyle.Fill;
+            mainPanel.Location = new Point(0, 0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.Padding = new Padding(20);
+            mainPanel.Size = new Size(1004, 766);
+            mainPanel.TabIndex = 0;
+            // 
+            // titleLabel
+            // 
+            titleLabel.AutoSize = true;
+            titleLabel.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            titleLabel.ForeColor = Color.FromArgb(33, 37, 41);
+            titleLabel.Location = new Point(0, 0);
+            titleLabel.Name = "titleLabel";
+            titleLabel.Size = new Size(620, 48);
+            titleLabel.TabIndex = 0;
+            titleLabel.Text = "🌐 DeepL Translator - Práctica Final";
+            // 
+            // techniquesLabel
+            // 
+            techniquesLabel.AutoSize = true;
+            techniquesLabel.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
+            techniquesLabel.ForeColor = Color.FromArgb(108, 117, 125);
+            techniquesLabel.Location = new Point(23, 664);
+            techniquesLabel.Name = "techniquesLabel";
+            techniquesLabel.Size = new Size(0, 21);
+            techniquesLabel.TabIndex = 1;
+            techniquesLabel.Click += techniquesLabel_Click;
+            // 
+            // inputLabel
+            // 
+            inputLabel.AutoSize = true;
+            inputLabel.Font = new Font("Segoe UI", 10F);
+            inputLabel.ForeColor = Color.FromArgb(73, 80, 87);
+            inputLabel.Location = new Point(0, 50);
+            inputLabel.Name = "inputLabel";
+            inputLabel.Size = new Size(203, 28);
+            inputLabel.TabIndex = 2;
+            inputLabel.Text = "Enter text to translate:";
+            // 
+            // _inputTextBox
+            // 
+            _inputTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            _inputTextBox.BackColor = Color.White;
+            _inputTextBox.BorderStyle = BorderStyle.FixedSingle;
+            _inputTextBox.Font = new Font("Segoe UI", 11F);
+            _inputTextBox.ForeColor = Color.FromArgb(33, 37, 41);
+            _inputTextBox.Location = new Point(0, 75);
+            _inputTextBox.Multiline = true;
+            _inputTextBox.Name = "_inputTextBox";
+            _inputTextBox.ScrollBars = ScrollBars.Vertical;
+            _inputTextBox.Size = new Size(1030, 120);
+            _inputTextBox.TabIndex = 0;
+            // 
+            // fromLabel
+            // 
+            fromLabel.AutoSize = true;
+            fromLabel.Font = new Font("Segoe UI", 10F);
+            fromLabel.ForeColor = Color.FromArgb(73, 80, 87);
+            fromLabel.Location = new Point(0, 210);
+            fromLabel.Name = "fromLabel";
+            fromLabel.Size = new Size(62, 28);
+            fromLabel.TabIndex = 3;
+            fromLabel.Text = "From:";
+            // 
+            // _sourceLanguageComboBox
+            // 
+            _sourceLanguageComboBox.BackColor = Color.White;
+            _sourceLanguageComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            _sourceLanguageComboBox.FlatStyle = FlatStyle.Flat;
+            _sourceLanguageComboBox.Font = new Font("Segoe UI", 10F);
+            _sourceLanguageComboBox.ForeColor = Color.FromArgb(33, 37, 41);
+            _sourceLanguageComboBox.Location = new Point(0, 235);
+            _sourceLanguageComboBox.Name = "_sourceLanguageComboBox";
+            _sourceLanguageComboBox.Size = new Size(200, 36);
+            _sourceLanguageComboBox.TabIndex = 1;
+            // 
+            // _swapButton
+            // 
+            _swapButton.BackColor = Color.FromArgb(108, 117, 125);
+            _swapButton.Cursor = Cursors.Hand;
+            _swapButton.FlatAppearance.BorderSize = 0;
+            _swapButton.FlatStyle = FlatStyle.Flat;
             _swapButton.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-
-            var toLabel = new Label
-            {
-                Name = "toLabel",
-                Text = "To:",
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(73, 80, 87),
-                AutoSize = true,
-                Location = new Point(260, 210)
-            };
-
-            _targetLanguageComboBox = new ComboBox
-            {
-                Name = "_targetLanguageComboBox",
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 10F),
-                Location = new Point(260, 235),
-                Size = new Size(200, 30),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(33, 37, 41),
-                FlatStyle = FlatStyle.Flat,
-                TabIndex = 3
-            };
-
-            _detectedLanguageLabel = new Label
-            {
-                Name = "_detectedLanguageLabel",
-                Text = "Detected: 🌐 Auto-detect",
-                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
-                ForeColor = Color.FromArgb(13, 110, 253),
-                AutoSize = true,
-                Location = new Point(0, 275),
-                Visible = false,
-                BackColor = Color.FromArgb(240, 248, 255), // Fondo azul claro
-                Padding = new Padding(5, 2, 5, 2) // Padding interno
-            };
-
-            // Botones de acción
-            _translateButton = CreateModernButton("🔄 Translate", new Point(480, 235), new Size(120, 30), Color.FromArgb(13, 110, 253));
+            _swapButton.ForeColor = Color.White;
+            _swapButton.Location = new Point(210, 235);
+            _swapButton.Name = "_swapButton";
+            _swapButton.Size = new Size(40, 47);
+            _swapButton.TabIndex = 2;
+            _swapButton.Text = "⇄";
+            _swapButton.UseVisualStyleBackColor = false;
+            // 
+            // toLabel
+            // 
+            toLabel.AutoSize = true;
+            toLabel.Font = new Font("Segoe UI", 10F);
+            toLabel.ForeColor = Color.FromArgb(73, 80, 87);
+            toLabel.Location = new Point(260, 210);
+            toLabel.Name = "toLabel";
+            toLabel.Size = new Size(36, 28);
+            toLabel.TabIndex = 4;
+            toLabel.Text = "To:";
+            // 
+            // _targetLanguageComboBox
+            // 
+            _targetLanguageComboBox.BackColor = Color.White;
+            _targetLanguageComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            _targetLanguageComboBox.FlatStyle = FlatStyle.Flat;
+            _targetLanguageComboBox.Font = new Font("Segoe UI", 10F);
+            _targetLanguageComboBox.ForeColor = Color.FromArgb(33, 37, 41);
+            _targetLanguageComboBox.Location = new Point(260, 235);
+            _targetLanguageComboBox.Name = "_targetLanguageComboBox";
+            _targetLanguageComboBox.Size = new Size(200, 36);
+            _targetLanguageComboBox.TabIndex = 3;
+            // 
+            // _detectedLanguageLabel
+            // 
+            _detectedLanguageLabel.AutoSize = true;
+            _detectedLanguageLabel.BackColor = Color.FromArgb(240, 248, 255);
+            _detectedLanguageLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
+            _detectedLanguageLabel.ForeColor = Color.FromArgb(13, 110, 253);
+            _detectedLanguageLabel.Location = new Point(0, 275);
+            _detectedLanguageLabel.Name = "_detectedLanguageLabel";
+            _detectedLanguageLabel.Padding = new Padding(5, 2, 5, 2);
+            _detectedLanguageLabel.Size = new Size(223, 29);
+            _detectedLanguageLabel.TabIndex = 5;
+            _detectedLanguageLabel.Text = "Detected: 🌐 Auto-detect";
+            _detectedLanguageLabel.Visible = false;
+            // 
+            // _translateButton
+            // 
+            _translateButton.BackColor = Color.FromArgb(13, 110, 253);
+            _translateButton.Cursor = Cursors.Hand;
+            _translateButton.FlatAppearance.BorderSize = 0;
+            _translateButton.FlatStyle = FlatStyle.Flat;
+            _translateButton.Font = new Font("Segoe UI", 9F);
+            _translateButton.ForeColor = Color.White;
+            _translateButton.Location = new Point(480, 235);
             _translateButton.Name = "_translateButton";
+            _translateButton.Size = new Size(120, 30);
             _translateButton.TabIndex = 4;
-
-            _clearButton = CreateModernButton("🗑️ Clear", new Point(610, 235), new Size(100, 30), Color.FromArgb(108, 117, 125));
+            _translateButton.Text = "🔄 Translate";
+            _translateButton.UseVisualStyleBackColor = false;
+            // 
+            // _clearButton
+            // 
+            _clearButton.BackColor = Color.FromArgb(108, 117, 125);
+            _clearButton.Cursor = Cursors.Hand;
+            _clearButton.FlatAppearance.BorderSize = 0;
+            _clearButton.FlatStyle = FlatStyle.Flat;
+            _clearButton.Font = new Font("Segoe UI", 9F);
+            _clearButton.ForeColor = Color.White;
+            _clearButton.Location = new Point(610, 235);
             _clearButton.Name = "_clearButton";
+            _clearButton.Size = new Size(100, 30);
             _clearButton.TabIndex = 5;
-
-            // Botón de cancelar
-            _cancelButton = CreateModernButton("❌ Cancelar", new Point(720, 235), new Size(100, 30), Color.FromArgb(220, 53, 69));
+            _clearButton.Text = "🗑️ Clear";
+            _clearButton.UseVisualStyleBackColor = false;
+            // 
+            // _cancelButton
+            // 
+            _cancelButton.BackColor = Color.FromArgb(220, 53, 69);
+            _cancelButton.Cursor = Cursors.Hand;
+            _cancelButton.FlatAppearance.BorderSize = 0;
+            _cancelButton.FlatStyle = FlatStyle.Flat;
+            _cancelButton.Font = new Font("Segoe UI", 9F);
+            _cancelButton.ForeColor = Color.White;
+            _cancelButton.Location = new Point(720, 235);
             _cancelButton.Name = "_cancelButton";
+            _cancelButton.Size = new Size(100, 30);
             _cancelButton.TabIndex = 9;
+            _cancelButton.Text = "❌ Cancelar";
+            _cancelButton.UseVisualStyleBackColor = false;
             _cancelButton.Visible = false;
-            
-            _cancelButton.Click += (sender, e) =>
-            {
-               // _cancellationTokenSource?.Cancel();
-                _cancelButton.Visible = false;
-                _translateButton.Enabled = true;
-                _translateButton.Text = "🔄 Traducir";
-                _progressBar.Visible = false;
-            };
-
-            // Barra de progreso
-            _progressBar = new ProgressBar
-            {
-                Name = "_progressBar",
-                Location = new Point(0, 300),
-                Size = new Size(840, 8), // Más alta para mejor visibilidad
-                Style = ProgressBarStyle.Continuous, // Cambiar a continuo para mostrar progreso real
-                Visible = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
-                ForeColor = Color.FromArgb(13, 110, 253)
-            };
-
-            // Área de texto de salida
-            var outputLabel = new Label
-            {
-                Name = "outputLabel",
-                Text = "Translation:",
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(73, 80, 87),
-                AutoSize = true,
-                Location = new Point(0, 315)
-            };
-
-            _outputTextBox = new TextBox
-            {
-                Name = "_outputTextBox",
-                Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
-                Font = new Font("Segoe UI", 11F),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.FromArgb(248, 249, 250),
-                ForeColor = Color.FromArgb(33, 37, 41),
-                Location = new Point(0, 340),
-                Size = new Size(840, 120),
-                ReadOnly = true,
-                TabIndex = 6,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            // Botones de acción para la traducción
-            _listenButton = CreateModernButton("🔊 Listen", new Point(0, 470), new Size(100, 35), Color.FromArgb(25, 135, 84));
-            _listenButton.Name = "_listenButton";
+            // 
+            // _progressBar
+            // 
+            _progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            _progressBar.ForeColor = Color.FromArgb(13, 110, 253);
+            _progressBar.Location = new Point(0, 300);
+            _progressBar.Name = "_progressBar";
+            _progressBar.Size = new Size(1024, 8);
+            _progressBar.Style = ProgressBarStyle.Continuous;
+            _progressBar.TabIndex = 10;
+            _progressBar.Visible = false;
+            // 
+            // outputLabel
+            // 
+            outputLabel.AutoSize = true;
+            outputLabel.Font = new Font("Segoe UI", 10F);
+            outputLabel.ForeColor = Color.FromArgb(73, 80, 87);
+            outputLabel.Location = new Point(0, 315);
+            outputLabel.Name = "outputLabel";
+            outputLabel.Size = new Size(110, 28);
+            outputLabel.TabIndex = 11;
+            outputLabel.Text = "Translation:";
+            // 
+            // _outputTextBox
+            // 
+            _outputTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            _outputTextBox.BackColor = Color.FromArgb(248, 249, 250);
+            _outputTextBox.BorderStyle = BorderStyle.FixedSingle;
+            _outputTextBox.Font = new Font("Segoe UI", 11F);
+            _outputTextBox.ForeColor = Color.FromArgb(33, 37, 41);
+            _outputTextBox.Location = new Point(0, 366);
+            _outputTextBox.Multiline = true;
+            _outputTextBox.Name = "_outputTextBox";
+            _outputTextBox.ReadOnly = true;
+            _outputTextBox.ScrollBars = ScrollBars.Vertical;
+            _outputTextBox.Size = new Size(1004, 120);
+            _outputTextBox.TabIndex = 6;
+            // 
+            // _listenButton
+            // 
+            _listenButton.BackColor = Color.FromArgb(25, 135, 84);
+            _listenButton.Cursor = Cursors.Hand;
             _listenButton.Enabled = false;
+            _listenButton.FlatAppearance.BorderSize = 0;
+            _listenButton.FlatStyle = FlatStyle.Flat;
+            _listenButton.Font = new Font("Segoe UI", 9F);
+            _listenButton.ForeColor = Color.White;
+            _listenButton.Location = new Point(-10, 534);
+            _listenButton.Name = "_listenButton";
+            _listenButton.Size = new Size(100, 35);
             _listenButton.TabIndex = 7;
-
-            _copyButton = CreateModernButton("📋 Copy", new Point(110, 470), new Size(100, 35), Color.FromArgb(255, 193, 7));
-            _copyButton.Name = "_copyButton";
+            _listenButton.Text = "🔊 Listen";
+            _listenButton.UseVisualStyleBackColor = false;
+            // 
+            // _copyButton
+            // 
+            _copyButton.BackColor = Color.FromArgb(255, 193, 7);
+            _copyButton.Cursor = Cursors.Hand;
             _copyButton.Enabled = false;
+            _copyButton.FlatAppearance.BorderSize = 0;
+            _copyButton.FlatStyle = FlatStyle.Flat;
+            _copyButton.Font = new Font("Segoe UI", 9F);
+            _copyButton.ForeColor = Color.White;
+            _copyButton.Location = new Point(100, 534);
+            _copyButton.Name = "_copyButton";
+            _copyButton.Size = new Size(100, 35);
             _copyButton.TabIndex = 8;
-
-            // Agregar todos los controles al panel principal
-            mainPanel.Controls.AddRange(new Control[]
-            {
-                titleLabel, 
-                techniquesLabel, // Agregar nueva etiqueta
-                inputLabel, 
-                _inputTextBox, 
-                fromLabel,
-                _sourceLanguageComboBox,
-                _swapButton,
-                toLabel,
-                _targetLanguageComboBox,
-                _detectedLanguageLabel,
-                _translateButton, 
-                _clearButton,
-                _cancelButton, // Agregar botón de cancelar
-                _progressBar,
-                outputLabel, 
-                _outputTextBox, 
-                _listenButton, 
-                _copyButton
-            });
-
-            // Agregar el panel principal al formulario
-            this.Controls.Add(mainPanel);
-        }
-
-        private Button CreateModernButton(string text, Point location, Size size, Color backColor)
-        {
-            var button = new Button
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                BackColor = backColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                Cursor = Cursors.Hand,
-                UseVisualStyleBackColor = false
-            };
-
-            // Configurar apariencia plana
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(backColor, 0.1f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(backColor, 0.1f);
-
-            return button;
-        }
-
-        private void SetupModernUI()
-        {
-            try
-            {
-                ApplyRoundedCorners(_inputTextBox, 8);
-                ApplyRoundedCorners(_outputTextBox, 8);
-                ApplyRoundedCorners(_sourceLanguageComboBox, 6);
-                ApplyRoundedCorners(_targetLanguageComboBox, 6);
-                ApplyRoundedCorners(_translateButton, 6);
-                ApplyRoundedCorners(_clearButton, 6);
-                ApplyRoundedCorners(_swapButton, 6);
-                ApplyRoundedCorners(_listenButton, 6);
-                ApplyRoundedCorners(_copyButton, 6);
-                ApplyRoundedCorners(_detectedLanguageLabel, 4);
-                ApplyRoundedCorners(_cancelButton, 6);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error applying rounded corners: {ex.Message}");
-            }
-
-            try
-            {
-                ApplyShadowEffect(_inputTextBox);
-                ApplyShadowEffect(_outputTextBox);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error applying shadow effects: {ex.Message}");
-            }
-        }
-
-        private void ApplyRoundedCorners(Control control, int radius)
-        {
-            if (control == null || control.Width <= 0 || control.Height <= 0)
-                return;
-
-            try
-            {
-                var path = new GraphicsPath();
-                path.AddArc(0, 0, radius, radius, 180, 90);
-                path.AddArc(control.Width - radius, 0, radius, radius, 270, 90);
-                path.AddArc(control.Width - radius, control.Height - radius, radius, radius, 0, 90);
-                path.AddArc(0, control.Height - radius, radius, radius, 90, 90);
-                path.CloseAllFigures();
-                control.Region = new Region(path);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error applying rounded corners to {control.Name}: {ex.Message}");
-            }
-        }
-
-        private void ApplyShadowEffect(Control control)
-        {
-            try
-            {
-                var parent = control.Parent;
-                if (parent == null) return;
-
-                // Crear un panel de sombra detrás del control
-                var shadowPanel = new Panel
-                {
-                    BackColor = Color.FromArgb(50, 0, 0, 0), // Sombra semi-transparente
-                    Location = new Point(control.Location.X + 2, control.Location.Y + 2),
-                    Size = control.Size,
-                    Anchor = control.Anchor
-                };
-
-                // Insertar la sombra detrás del control
-                parent.Controls.Add(shadowPanel);
-                shadowPanel.BringToFront();
-                control.BringToFront();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error applying shadow effect to {control.Name}: {ex.Message}");
-            }
+            _copyButton.Text = "📋 Copy";
+            _copyButton.UseVisualStyleBackColor = false;
+            // 
+            // MainForm
+            // 
+            BackColor = Color.FromArgb(248, 249, 250);
+            ClientSize = new Size(1004, 766);
+            Controls.Add(mainPanel);
+            Font = new Font("Segoe UI", 9F);
+            MinimumSize = new Size(800, 650);
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "DeepL Translator";
+            Load += MainForm_Load;
+            mainPanel.ResumeLayout(false);
+            mainPanel.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion
