@@ -15,9 +15,11 @@ namespace DeepLTranslator
 {
     public partial class MainForm : Form
     {
-        private readonly DeepLService _deepLService = null!;
-        private readonly TextToSpeechService _textToSpeechService = null!;
-        private readonly List<LanguageInfo> _languages = new();
+
+        private readonly DeepLService _deepLService;
+        private readonly TextToSpeechService _textToSpeechService;
+        private readonly List<LanguageInfo> _languages;
+
         private string _lastTranslatedText = string.Empty;
 
         private CancellationTokenSource? _cancellationTokenSource;
@@ -28,8 +30,12 @@ namespace DeepLTranslator
             InitializeComponent();
 
             // Si se está ejecutando dentro del diseñador, omitir la lógica de tiempo de ejecución
+
+            // Permitir que el diseñador de Visual Studio cargue el formulario sin ejecutar lógica de tiempo de ejecución
             if (IsInDesignMode())
             {
+                InitializeComponent();
+                _languages = new List<LanguageInfo>();
                 return;
             }
 
@@ -52,9 +58,12 @@ namespace DeepLTranslator
                 _deepLService = new DeepLService(AppConfig.DeepLApiKey);
                 _textToSpeechService = new TextToSpeechService();
 
-                _languages.AddRange(LanguageService.GetLanguagesWithFlags()
-                    .OrderBy(l => l.Name));
 
+                _languages = LanguageService.GetLanguagesWithFlags()
+                    .OrderBy(l => l.Name)
+                    .ToList();
+
+                InitializeComponent();
                 LoadLanguages();
                 SetupEventHandlers();
 
@@ -168,6 +177,7 @@ namespace DeepLTranslator
             {
                 return;
             }
+
 
             // Cargar idiomas de origen (incluir "Auto-detect" como primera opción)
             _sourceLanguageComboBox.Items.Clear();
