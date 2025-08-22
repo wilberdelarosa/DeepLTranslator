@@ -15,15 +15,22 @@ namespace DeepLTranslator
 {
     public partial class MainForm : Form
     {
+
         private readonly DeepLService _deepLService;
         private readonly TextToSpeechService _textToSpeechService;
         private readonly List<LanguageInfo> _languages;
+
         private string _lastTranslatedText = string.Empty;
 
         private CancellationTokenSource? _cancellationTokenSource;
 
         public MainForm()
         {
+            // Crear controles para que el diseñador de Visual Studio pueda renderizar el formulario
+            InitializeComponent();
+
+            // Si se está ejecutando dentro del diseñador, omitir la lógica de tiempo de ejecución
+
             // Permitir que el diseñador de Visual Studio cargue el formulario sin ejecutar lógica de tiempo de ejecución
             if (IsInDesignMode())
             {
@@ -50,6 +57,7 @@ namespace DeepLTranslator
 
                 _deepLService = new DeepLService(AppConfig.DeepLApiKey);
                 _textToSpeechService = new TextToSpeechService();
+
 
                 _languages = LanguageService.GetLanguagesWithFlags()
                     .OrderBy(l => l.Name)
@@ -164,6 +172,13 @@ namespace DeepLTranslator
 
         private void LoadLanguages()
         {
+            // Si los controles no están inicializados (p.ej. en modo diseño), salir
+            if (_sourceLanguageComboBox == null || _targetLanguageComboBox == null)
+            {
+                return;
+            }
+
+
             // Cargar idiomas de origen (incluir "Auto-detect" como primera opción)
             _sourceLanguageComboBox.Items.Clear();
             _sourceLanguageComboBox.Items.Add("🌐 Auto-detect");
@@ -175,7 +190,10 @@ namespace DeepLTranslator
             // Cargar idiomas de destino
             _targetLanguageComboBox.Items.Clear();
             _targetLanguageComboBox.Items.AddRange(formattedLanguages);
-            _targetLanguageComboBox.SelectedIndex = 0; // Inglés por defecto
+
+            // Seleccionar inglés como idioma de destino por defecto
+            var defaultIndex = _languages.FindIndex(l => l.Code.Equals("EN-US", StringComparison.OrdinalIgnoreCase));
+            _targetLanguageComboBox.SelectedIndex = defaultIndex >= 0 ? defaultIndex : 0;
         }
 
         private async Task TranslateText()
