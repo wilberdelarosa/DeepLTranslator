@@ -143,11 +143,11 @@ namespace DeepLTranslator
             _inputTextBox.BorderStyle = BorderStyle.FixedSingle;
             _inputTextBox.Font = new Font("Segoe UI", 11F);
             _inputTextBox.ForeColor = Color.FromArgb(33, 37, 41);
-            _inputTextBox.Location = new Point(0, 75);
+            _inputTextBox.Location = new Point(0, 87);
             _inputTextBox.Multiline = true;
             _inputTextBox.Name = "_inputTextBox";
             _inputTextBox.ScrollBars = ScrollBars.Vertical;
-            _inputTextBox.Size = new Size(1030, 120);
+            _inputTextBox.Size = new Size(981, 120);
             _inputTextBox.TabIndex = 0;
             // 
             // fromLabel
@@ -300,12 +300,12 @@ namespace DeepLTranslator
             _outputTextBox.BorderStyle = BorderStyle.FixedSingle;
             _outputTextBox.Font = new Font("Segoe UI", 11F);
             _outputTextBox.ForeColor = Color.FromArgb(33, 37, 41);
-            _outputTextBox.Location = new Point(0, 366);
+            _outputTextBox.Location = new Point(0, 361);
             _outputTextBox.Multiline = true;
             _outputTextBox.Name = "_outputTextBox";
             _outputTextBox.ReadOnly = true;
             _outputTextBox.ScrollBars = ScrollBars.Vertical;
-            _outputTextBox.Size = new Size(1004, 120);
+            _outputTextBox.Size = new Size(981, 120);
             _outputTextBox.TabIndex = 6;
             // 
             // _listenButton
